@@ -1,0 +1,11 @@
+datasets
+matplotlib
+mlflow
+pandas
+scikit-learn
+seaborn
+transformers
+torch
+numpy
+transformers[torch]
+torchvision

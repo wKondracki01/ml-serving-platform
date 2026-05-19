@@ -1,0 +1,32 @@
+services:
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: secretpass
+      POSTGRES_USER: username
+      POSTGRES_DB: mlflow_db
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  
+  mlflow:
+    build: ./mlflow
+    environment:
+      BACKEND_STORE_URI: postgresql://username:secretpass@db:5432/mlflow_db
+    ports:
+      - 5001:5000
+    depends_on:
+      - db
+
+  training:
+    build: ./training
+    volumes:
+      - ./training/data:/app/data
+    depends_on:
+      - mlflow
+
+volumes:
+  pgdata:
+    
