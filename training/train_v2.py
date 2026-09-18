@@ -124,6 +124,7 @@ class Model:
 
         mlflow.transformers.log_model(
             transformers_model={"model": self.model, "tokenizer": self.train_dataset.tokenizer},
+            task="text-classification",
             name="model",
             registered_model_name="imdb-sentiment-v2"
         )

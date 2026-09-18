@@ -15,11 +15,11 @@ if __name__ == "__main__":
 
     # Load v1 and v2 model from Registry
     model_v1 = mlflow.sklearn.load_model("models:/imdb-sentiment-v1/1")
-    model_v2 = mlflow.transformers.load_model("models:/imdb-sentiment-v2/1")
+    model_v2 = mlflow.transformers.load_model("models:/imdb-sentiment-v2/2")
 
     # Predictions for two of the models
     y_pred_v1 = model_v1.predict(texts)
-    raw = model_v2(texts.tolist())
+    raw = model_v2(texts.tolist(), truncation=True, max_length=256)
     y_pred_v2 = [int(r["label"].split("_")[1]) for r in raw]
 
     # Metrics

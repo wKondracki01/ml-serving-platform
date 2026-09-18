@@ -1,4 +1,4 @@
-"""FastAPI app serving the v1 sentiment model (TF-IDF + Logistic Regression)."""
+"""FastAPI app serving the v2 sentiment model (fine-tuned DistilBERT)."""
 
 import os
 import time
@@ -16,12 +16,12 @@ from common.schemas import (
     PredictRequest,
     PredictResponse,
 )
-from v1.model import SentimentModel
+from v2.model import SentimentModel
 
 MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI", "http://mlflow:5000")
-MODEL_URI = os.environ.get("MODEL_URI", "models:/imdb-sentiment-v1/1")
-MODEL_VERSION = "v1"
-MODEL_TYPE = "tfidf+logreg"
+MODEL_URI = os.environ.get("MODEL_URI", "models:/imdb-sentiment-v2/2")
+MODEL_VERSION = "v2"
+MODEL_TYPE = "distilbert"
 
 model: SentimentModel | None = None
 
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Sentiment API v1", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Sentiment API v2", version="1.0.0", lifespan=lifespan)
 
 
 def get_model() -> SentimentModel:

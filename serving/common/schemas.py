@@ -4,7 +4,9 @@ from pydantic import BaseModel, Field
 
 
 class PredictRequest(BaseModel):
-    text: str = Field(..., min_length=1, max_length=5000)
+    # IMDB reviews go up to ~13k characters; cap well above that to only
+    # guard against abusive payloads, not reject real reviews.
+    text: str = Field(..., min_length=1, max_length=20000)
 
 
 class PredictResponse(BaseModel):
