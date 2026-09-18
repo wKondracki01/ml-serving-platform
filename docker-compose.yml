@@ -30,6 +30,18 @@ services:
     depends_on:
       - mlflow
 
+  api-v1:
+    build:
+      context: ./serving
+      dockerfile: v1/Dockerfile
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MODEL_URI: models:/imdb-sentiment-v1/1
+    ports:
+      - 8000:8000
+    depends_on:
+      - mlflow
+
 volumes:
   pgdata:
   mlartifacts:
