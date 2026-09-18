@@ -1,4 +1,5 @@
 venv/
 training/data/*.csv
+training/results_model_v2/
 __pycache__/
 .DS_Store

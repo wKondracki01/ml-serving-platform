@@ -17,6 +17,8 @@ services:
       BACKEND_STORE_URI: postgresql://username:secretpass@db:5432/mlflow_db
     ports:
       - 5001:5000
+    volumes:
+      - mlartifacts:/mlartifacts
     depends_on:
       - db
 
@@ -24,9 +26,11 @@ services:
     build: ./training
     volumes:
       - ./training/data:/app/data
+      - ./training:/app
     depends_on:
       - mlflow
 
 volumes:
   pgdata:
+  mlartifacts:
     

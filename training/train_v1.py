@@ -7,6 +7,7 @@ trains a Logistic Regression model, and logs results to MLflow.
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
 from sklearn import metrics
 import mlflow
 import matplotlib.pyplot as plt
@@ -30,21 +31,6 @@ class DatasetReader:
         """Loads CSV file specified in self.file_path into self.split."""
         self.split = pd.read_csv(self.file_path)
 
-class Vectorizer:
-    """TF-IDF vectorizer wrapper. Fits on training data and transforms both splits."""
-    def __init__(self, train_data, test_data):
-        self.train_data = train_data
-        self.test_data = test_data
-        self.vectorizer = TfidfVectorizer()
-    
-    def fit_vectorizer(self):
-        """Fits TF-IDF on training data and returns transformed sparse matrix."""
-        return self.vectorizer.fit_transform(self.train_data)
-
-    def transform(self):
-        """Transforms test data using already fitted vectorizer."""
-        return self.vectorizer.transform(self.test_data)
-
 class Model:
     """Logistic Regression model with MLflow tracking integration."""
     def __init__(self, X_train, y_train, X_test, y_test, CFG):
@@ -53,12 +39,15 @@ class Model:
         self.X_test = X_test
         self.y_test = y_test
         self.cfg = CFG
-        self.model  = LogisticRegression(
-            penalty = self.cfg.penalty,
-            C = self.cfg.C,
-            solver = self.cfg.solver,
-            max_iter = self.cfg.max_iter
-        )
+        self.model  = Pipeline([
+            ("tfidf", TfidfVectorizer()),
+            ("clf", LogisticRegression(
+                penalty = self.cfg.penalty,
+                C = self.cfg.C,
+                solver = self.cfg.solver,
+                max_iter = self.cfg.max_iter
+            )),
+        ])
         self.acc_score = None
         self.f1_score = None
         self.conf_matrix = None
@@ -115,11 +104,6 @@ if __name__ == "__main__":
     train_data = DatasetReader("data/train.csv").split
     test_data = DatasetReader("data/test.csv").split
 
-    # Vectorize text using TF-IDF
-    vectorizer = Vectorizer(train_data["text"], test_data["text"])
-    X_train = vectorizer.fit_vectorizer()
-    X_test = vectorizer.transform()
-
     # Extract labels
     y_train = train_data["label"]
     y_test = test_data["label"]
@@ -130,6 +114,6 @@ if __name__ == "__main__":
 
     # Train and evaluate
     cfg = CFG()
-    model = Model(X_train, y_train, X_test, y_test, cfg)
+    model = Model(train_data["text"], y_train, test_data["text"], y_test, cfg)
     model.train()
     model.evaluate()    
